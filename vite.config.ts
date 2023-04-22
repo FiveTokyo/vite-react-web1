@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
 		resolve: {
 			alias: [{ find: '@', replacement: path.resolve(__dirname, './src') }]
 		},
+		esbuild: {
+      pure: [],
+    },
 		plugins: [
 			react(),
 			svgrPlugin({
@@ -32,10 +35,29 @@ export default defineConfig(({ mode }) => {
 				}
 			}
 		},
+		css: {
+			preprocessorOptions: {
+				less: {
+					javascriptEnabled: true,
+					// additionalData: `@import "@/styles/var.less";`,
+					// modifyVars: {
+					//   "@primary-color": "#4377FE", //设置antd主题色
+					// },
+				},
+			},
+		},
 		build: {
 			target: 'es2015',
 			reportCompressedSize: false,
 			chunkSizeWarningLimit: 2000,
+			outDir: "dist",
+      rollupOptions: {
+        output: {
+          chunkFileNames: "assets/js/[name]-[hash].js",
+          entryFileNames: "assets/js/[name]-[hash].js",
+          assetFileNames: "assets/[ext]/[name]-[hash].[ext]",
+        },
+      },
 			sourcemap: mode !== 'production',
 			minify: 'esbuild'
 		}
