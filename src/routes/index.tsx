@@ -31,12 +31,12 @@ const routes: RouteConfig[] = [
 						path: 'child1',
 						name: '子组件1',
 						keepAlive: true,
-						element: lazyLoad(lazy(() => import('@/pages/Parent/Child1')))
+						element: lazyLoad(lazy(() => import('@/pages/parent/Child1')))
 					},
 					{
 						path: 'child2',
 						name: '子组件2',
-						element: lazyLoad(lazy(() => import('@/pages/Parent/Child2')))
+						element: lazyLoad(lazy(() => import('@/pages/parent/Child2')))
 					}
 				]
 			},
@@ -85,12 +85,12 @@ const routes: RouteConfig[] = [
 					{
 						path: 'sell',
 						name: '销售数据',
-						element: lazyLoad(lazy(() => import('@/pages/Analyse/Sell')))
+						element: lazyLoad(lazy(() => import('@/pages/analyse/Sell')))
 					},
 					{
 						path: 'user',
 						name: '用户统计',
-						element: lazyLoad(lazy(() => import('@/pages/Analyse/User')))
+						element: lazyLoad(lazy(() => import('@/pages/analyse/User')))
 					}
 				]
 			}
@@ -98,13 +98,13 @@ const routes: RouteConfig[] = [
 	},
 	{
 		path: 'login',
-		element: lazyLoad(lazy(() => import('@/pages/Login')))
+		element: lazyLoad(lazy(() => import('@/pages/login')))
 	},
 	{
 		path: '/403',
 		element: <div className="tw-font-bold">无权限</div>
 	},
-	{ path: '*', element: lazyLoad(lazy(() => import('@/pages/NotFound'))) }
+	{ path: '*', element: lazyLoad(lazy(() => import('@/pages/notFound'))) }
 ]
 
 export default routes as RouteObject[]

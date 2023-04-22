@@ -1,0 +1,9 @@
+/**
+ * @author $user
+ * @date $datetime
+ * @since ${pkg.version}
+ */
+ 
+.${ref.dirName} {
+
+}
