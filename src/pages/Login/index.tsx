@@ -1,12 +1,11 @@
 import { Button, Form, Input, message } from 'antd'
 // import { reqLogin } from '@/api'
-import { useNavigate } from 'react-router'
-import { useGlobal } from '@/core'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 
 const Login = () => {
 	const navigate = useNavigate()
-	const { globalState, dispatch } = useGlobal()
-
+	const [params] = useSearchParams();
+	console.log('params', params.get('a'))
 	const onFinish = (values: any) => {
 		// reqLogin(values).then(res => {
 		// 	const { success, msg, data } = res
@@ -18,16 +17,8 @@ const Login = () => {
 		// 		message.error(msg)
 		// 	}
 		// })
-
 		message.success('登录成功')
-		dispatch({
-			...globalState,
-			userInfo: {
-				userId: '1',
-				nickName: 'Thomas',
-				headImgUrl: 'https://avatars.githubusercontent.com/u/48620706?v=4'
-			}
-		})
+
 		setTimeout(() => navigate('/'), 500)
 	}
 

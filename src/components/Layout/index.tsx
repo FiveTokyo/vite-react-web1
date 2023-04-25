@@ -1,15 +1,14 @@
-import HeaderPro, { BaseHeaderProProps } from './components/HeaderPro'
 import LeftSiderPro, { BaseLeftSiderProProps } from './components/LeftSiderPro'
 import { useEffect, useState } from 'react'
-import { useLocation, useRoutes } from 'react-router'
+import { useLocation, useOutlet, useRoutes } from 'react-router-dom'
 
 import { Layout } from 'antd'
 import { layoutSettings } from '@/config/core'
 import routes from '@/routes'
 import ContentPro from './components/ContentPro'
-import withRouter from '../Router/withRouter'
+import withRouter from '../../core/Router/withRouter'
 
-export interface LayoutProProps extends BaseLeftSiderProProps, BaseHeaderProProps {
+export interface LayoutProProps extends BaseLeftSiderProProps {
 	/* 默认是否收起 */
 	defaultCollapsed?: boolean
 	/* 是否开启足迹标签  默认为true */
@@ -37,22 +36,17 @@ function getOpenKeys(location: ReturnType<typeof useLocation>) {
 
 const LayoutPro = withRouter(props => {
 	const {
-		logo,
-		headerHeight = 56,
-		renderSider = true,
-		renderHeader = true,
 		siderWidth = 200,
-		renderHeaderMenu = true,
 		defaultCollapsed = false,
 		isTabs = true,
-		headerRight,
 		maxLength
 	} = layoutSettings || props
 
 	const { location } = props
 	const layoutRoutes = routes.find(item => item.path === '/*')?.children || []
-	const ele = useRoutes(layoutRoutes, location)
-	const [collapsed, setCollapsed] = useState(defaultCollapsed)
+	const Outlet = useOutlet()
+	console.log(Outlet)
+
 	const [menuState, setMenuState] = useState<MenuState>({
 		openKeys: [],
 		selectedKeys: []
@@ -69,31 +63,15 @@ const LayoutPro = withRouter(props => {
 	}, [location.pathname])
 
 	return (
-		<Layout style={{ height: '100vh' }}>
-			<HeaderPro
-				logo={logo}
-				logoWidth={siderWidth}
-				renderHeader={renderHeader}
-				headerHeight={headerHeight}
-				renderHeaderMenu={renderHeaderMenu}
-				headerRight={headerRight}
-				setCollapsed={setCollapsed}
-				collapsed={collapsed}
+		<Layout style={{ height: '100vh', width: '100vw', position: 'fixed' }}>
+			<LeftSiderPro
+				siderWidth={siderWidth}
 				menuState={menuState}
 				onMenuStateChange={setMenuState}
 			/>
-			<Layout>
-				<LeftSiderPro
-					siderWidth={siderWidth}
-					collapsed={collapsed}
-					renderSider={renderSider}
-					menuState={menuState}
-					onMenuStateChange={setMenuState}
-				/>
-				<ContentPro maxLength={maxLength} isTabs={isTabs}>
-					{ele}
-				</ContentPro>
-			</Layout>
+			<ContentPro maxLength={maxLength} isTabs={isTabs}>
+				{Outlet}
+			</ContentPro>
 		</Layout>
 	)
 })

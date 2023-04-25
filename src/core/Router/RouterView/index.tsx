@@ -1,13 +1,11 @@
 // 路由显示容器
 
 import { FC, useEffect, useState } from 'react'
-import { Provider, RouteConfigContext } from '../../context/router'
-import { Route, Routes as RoutesCom } from 'react-router'
+import { Route, Routes as RoutesCom } from 'react-router-dom'
 
 import { Routes } from '../type'
 import { getItems } from '../utils'
 import routes from '@/routes'
-import { useGlobal } from '@/core/context/global'
 
 const initState = {
 	leftItems: [],
@@ -21,11 +19,8 @@ export type RouteContainerProps = {
 }
 
 const RouterView: FC<any> = () => {
-	const {
-		globalState: { routeAccess }
-	} = useGlobal()
 	// const element = useRoutes(routes)
-	const [routeState, setRouteState] = useState<RouteConfigContext>(initState)
+	const [routeState, setRouteState] = useState<any>()
 
 	useEffect(() => {
 		if (!routes.length) {
@@ -34,18 +29,16 @@ const RouterView: FC<any> = () => {
 		const layoutReoutes =
 			routes.find(route => route.path === '/*' || route.path === '/')?.children || []
 		// 获取菜单需要显示的items
-		const o = getItems(layoutReoutes, routeAccess || {})
+		const o = getItems(layoutReoutes, {})
 		setRouteState(o)
-	}, [routes, routeAccess])
+	}, [routes])
 
 	return (
-		<Provider value={routeState}>
-			<RoutesCom>
-				{routes.map(route => (
-					<Route key={route.path} path={route.path} element={route.element} />
-				))}
-			</RoutesCom>
-		</Provider>
+		<RoutesCom>
+			{routes.map(route => (
+				<Route key={route.path} path={route.path} element={route.element} />
+			))}
+		</RoutesCom>
 	)
 }
 

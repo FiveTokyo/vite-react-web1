@@ -1,9 +1,12 @@
 import { FC, useState } from 'react'
 import KeepAlive, { CacheEle, KeepAliveProps } from '@/core/Router/KeepAlive'
+import { UserOutlined, DownOutlined } from '@ant-design/icons'
 import { Content } from 'antd/es/layout/layout'
-import { useRoutes } from 'react-router'
 import HistoryTabPro from '../HistoryTabPro'
-import styles from './index.module.css'
+import styles from './index.module.less'
+import { useOutlet, useRoutes } from 'react-router-dom'
+import { Dropdown, Avatar, MenuProps } from 'antd'
+import HeaderDropDown from '../HeaderDropDown'
 
 export interface ContentProProps {
 	isTabs?: boolean
@@ -12,16 +15,16 @@ export interface ContentProProps {
 }
 
 const ContentPro: FC<ContentProProps> = props => {
-	const { isTabs, maxLength, children } = props
-
+	const { maxLength, children } = props
 	// 缓存的元素节点数组
 	const [cacheEleList, setCacheEleList] = useState<CacheEle[]>([])
 
 	return (
 		<div className={styles.content}>
-			{isTabs && (
+			<div className={styles.header}>
 				<HistoryTabPro cacheEleList={cacheEleList} setCacheEleList={setCacheEleList} />
-			)}
+				<HeaderDropDown></HeaderDropDown>
+			</div>
 			<Content>
 				<KeepAlive
 					cacheEleList={cacheEleList}

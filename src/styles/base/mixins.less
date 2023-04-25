@@ -1,0 +1,42 @@
+.ellipsis() {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.multi-ellipsis(@lines) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: @lines;
+
+    /*! stylelint-disable */
+
+    /*! autoprefixer: off */
+    display: box;
+    -webkit-box-orient: vertical;
+
+    /*! stylelint-enable */
+}
+
+// flex布局
+.flex-base(@justify: center, @align: center, @direction: row) {
+    display: flex;
+    flex-direction: @direction;
+    align-items: @align;
+    justify-content: @justify;
+}
+
+// 点击热区放大
+.scale-tab(@widthZoom: 150%, @heightZoom: 150%) {
+    position: relative;
+
+    &::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: @widthZoom;
+        height: @heightZoom;
+        content: "";
+        transform: translateX(-50%) translateY(-50%);
+    }
+}

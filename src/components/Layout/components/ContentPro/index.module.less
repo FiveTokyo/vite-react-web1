@@ -1,0 +1,32 @@
+@import '@/styles/base';
+
+.header {
+	height: @header-height;
+	background-color: #fff;
+	margin-bottom: 5px;
+	flex: 1;
+}
+
+.content {
+	// margin: 0px 5px 2px 15px;
+	border-radius: 4px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	:global {
+		.ant-layout-content {
+			background: #fff;
+			height: 100%;
+			padding: 24px;
+		}
+	}
+}
+
+.header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+

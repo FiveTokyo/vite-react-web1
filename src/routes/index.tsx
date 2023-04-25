@@ -1,4 +1,4 @@
-import { Navigate, RouteObject } from 'react-router'
+import { Navigate, RouteObject } from 'react-router-dom'
 
 import { RouteConfig } from '@/core/Router/type'
 import { lazy } from 'react'
@@ -13,7 +13,7 @@ import { lazyLoad } from '@/core/Router/utils'
 const routes: RouteConfig[] = [
 	{
 		path: '/*',
-		element: lazyLoad(lazy(() => import('@/core/Layout'))),
+		element: lazyLoad(lazy(() => import('@/components/Layout'))),
 		children: [
 			{
 				index: true,
@@ -67,8 +67,20 @@ const routes: RouteConfig[] = [
 				children: [
 					{
 						path: 'common1',
-						name: '共有1',
-						element: <div>共有1</div>
+						name: '共有共有1',
+						element: <div>共有共有1</div>,
+						children: [
+							{
+								path: 'commo2n2',
+								name: '共有共有1',
+								element: <div>共有1</div>
+							},
+							{
+								path: 'commo2n21',
+								name: '共有共有2',
+								element: <div>共有2</div>
+							}
+						]
 					},
 					{
 						path: 'common2',
@@ -107,4 +119,4 @@ const routes: RouteConfig[] = [
 	{ path: '*', element: lazyLoad(lazy(() => import('@/pages/notFound'))) }
 ]
 
-export default routes as RouteObject[]
+export default routes 

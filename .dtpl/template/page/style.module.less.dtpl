@@ -3,7 +3,7 @@
  * @date $datetime
  * @since ${pkg.version}
  */
- 
+@import '@/styles/base';
 .${ref.dirName} {
 
 }

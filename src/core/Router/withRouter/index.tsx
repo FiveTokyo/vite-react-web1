@@ -1,7 +1,6 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ComponentType } from 'react'
-import { Items, useRouteConfig } from '@/core/context/router'
 import { Merge } from '../type'
 
 type Location = ReturnType<typeof useLocation>
@@ -21,8 +20,6 @@ export interface RouteComponentProps<T = DefaultParams> {
 	}
 	params: T
 	navigate: Navigate
-	leftItems: Items
-	topItems: Items
 }
 
 function withRouter<Props, Params = DefaultParams>(
@@ -33,7 +30,6 @@ function withRouter<Props, Params = DefaultParams>(
 		const navigate = useNavigate()
 		const params = useParams()
 		const match = { params }
-		const { leftItems, topItems } = useRouteConfig()
 		const history = {
 			back: () => navigate(-1),
 			goBack: () => navigate(-1),
@@ -50,8 +46,6 @@ function withRouter<Props, Params = DefaultParams>(
 			// @ts-ignore
 			<Component
 				{...props}
-				leftItems={leftItems}
-				topItems={topItems}
 				history={history}
 				location={location}
 				match={match}

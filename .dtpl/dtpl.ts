@@ -36,9 +36,7 @@ export default function (source: any) {
           if (/^[A-Z]/.test(rawModuleName)) {
             return false;
           }
-          console.log('gitName():', gitName())
           const path = relativeFilePath.replace('\\', '')
-          source.app.debug(path, 'path:', path, relativeFilePath)
           if ((!path.startsWith('srcpages') && !path.startsWith('src/pages')) || path.endsWith('components')) {
             return false;
           }

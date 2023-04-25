@@ -6,7 +6,6 @@ import {
 } from 'react'
 import { Form, Upload, Modal, Input, UploadFile, UploadProps } from 'antd'
 import { RcFile } from 'antd/es/upload'
-import { useGlobal } from '@/core'
 
 export interface UserModalRef {
 	open: () => void
@@ -31,8 +30,6 @@ const onFinish = (values: any) => {
 
 const UserModal: ForwardRefRenderFunction<UserModalRef, {}> = (_, ref) => {
 	const [open, setOpen] = useState(false)
-	const { globalState } = useGlobal()
-	const { userInfo } = globalState
 	const [fileList, setFileList] = useState<UploadFile[]>([
 		{
 			uid: '-1',
@@ -82,7 +79,7 @@ const UserModal: ForwardRefRenderFunction<UserModalRef, {}> = (_, ref) => {
 				<Form.Item
 					name="nickName"
 					label="名称"
-					initialValue={userInfo?.nickName}
+					initialValue={'tokyo'}
 					rules={[{ required: true, message: '姓名不能为空!' }]}
 				>
 					<Input />

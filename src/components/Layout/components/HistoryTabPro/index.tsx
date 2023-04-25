@@ -1,17 +1,19 @@
 // 浏览足迹页签
 
-import { TabsProps } from 'antd'
-import { Dispatch, useEffect, useMemo, useRef, useState } from 'react'
+import { TabsProps, Tabs } from 'antd'
+import { Dispatch, Key, useEffect, useMemo, useRef, useState } from 'react'
 import routes from '@/routes'
-import styles from './index.module.css'
+import styles from './index.module.less'
+import ResizeObserver from 'rc-resize-observer'
 import classNames from 'classnames'
 import { cloneDeep, isEmpty } from 'lodash-es'
 import { useClickAway, useSize } from 'ahooks'
 import { CacheEle } from '@/core/Router/KeepAlive'
-import { CloseOutlined } from '@ant-design/icons'
+import { CloseOutlined, EllipsisOutlined } from '@ant-design/icons'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import withRouter from '@/core/Router/withRouter'
 import { searchRoute } from '@/core/Router/utils'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 type OperationType = 'RELOAD' | 'CLOSE' | 'CLOSE_LEFT' | 'CLOSE_RIGHT' | 'CLOSE_OTHER'
 
@@ -22,10 +24,15 @@ type Item = GetArrayValue<Required<TabsProps>['items']>
 export interface HistoryTabProProps {
 	cacheEleList: CacheEle[]
 	setCacheEleList: Dispatch<React.SetStateAction<CacheEle[]>>
+	maxLength?: number
 }
+let a: any = null
 
 const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
-	const { location, navigate, cacheEleList, setCacheEleList } = props
+	const { cacheEleList, setCacheEleList, maxLength = 10 } = props
+
+	const location = useLocation()
+	const navigate = useNavigate()
 
 	const tabsRef = useRef(null)
 
@@ -35,9 +42,15 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 	const [items, setItems] = useState<Item[]>([])
 	const [pos, setPos] = useState<{ x: number; y: number }>()
 
-	useClickAway(() => setPos(undefined), tabsRef, ['mousedown'])
+	//移动尝试
+	const [translateX, setTranslateX] = useState(0)
+	// const tabsRef = useRef(null);
 
-	const size = useSize(tabsRef)
+	//移动尝试
+
+	// useClickAway(() => setPos(undefined), tabsRef, ['mousedown'])
+
+	// const size = useSize(tabsRef)
 
 	useEffect(() => {
 		// 判断是否添加
@@ -83,7 +96,7 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 	function onContextChange(event: any, item: Item) {
 		event.preventDefault()
 		// 如果不是当前活跃的tab，不弹出菜单
-		if (item.key !== pathname) return
+		// if (item.key !== pathname) return
 		const { pageX, pageY } = event
 		setPos({
 			x: pageX,
@@ -167,20 +180,13 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 		fn?.()
 	}
 	// 是否可以关闭此卡片
-	const disabledClose = items.length <= 1
+	const disabledClose = items.length > 1
 	// 是否禁用关闭左侧
 	const disabledCloseLeft = items[0]?.key === pathname
 	// 是否禁用关闭右侧
 	const disabledCloseRight = items.at(-1)?.key === pathname
 	// 是否禁用关闭其他
 	const disabledCloseOther = items.length <= 1
-
-	const computedWidth = useMemo(() => {
-		const num = items.length
-		const allWidth = size?.width ?? 0
-		const cell = allWidth / num
-		return cell - 6
-	}, [size, items])
 
 	// 列表组件
 	const List = () =>
@@ -190,14 +196,14 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 					<div
 						ref={provided.innerRef}
 						className={classNames(styles.item, item.key === activeKey && styles.checked)}
-						style={{ maxWidth: `${computedWidth}px` }}
+						// style={{ minWidth: `max-content` }}
 						onContextMenu={e => onContextChange(e, item)}
 						onClick={() => item.key !== pathname && onChange(item.key)}
 						{...provided.draggableProps}
 						{...provided.dragHandleProps}
 					>
 						<div className="tw-truncate">{item.label}</div>
-						{!!index && (
+						{disabledClose && (
 							<CloseOutlined
 								className={styles.closeIcon}
 								onClick={e => {
@@ -231,23 +237,25 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 		const newItems = reorder(items, startIdx, endIdx)
 		setItems(newItems)
 	}
-
 	return (
 		<>
-			<div className={styles.tabsPro} ref={tabsRef}>
+			<div className={styles.tabsPro}>
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId="group" direction="horizontal">
-						{provided => (
-							<div
-								ref={provided.innerRef}
-								className={styles.group}
-								{...provided.droppableProps}
-							>
-								{/* @ts-ignore */}
-								<List />
-								{provided.placeholder}
-							</div>
-						)}
+						{provided => {
+							return (
+								<div
+									ref={provided.innerRef}
+									className={styles.group}
+									{...provided.droppableProps}
+									style={{left: `${translateX}px`}}
+								>
+									{/* @ts-ignore */}
+									<List />
+									{provided.placeholder}
+								</div>
+							)
+						}}
 					</Droppable>
 				</DragDropContext>
 
@@ -258,7 +266,7 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 					<div onClick={() => handleOperation('RELOAD')}>刷新</div>
 					<div
 						className={classNames(disabledClose && styles.disabled)}
-						onClick={() => handleOperation('CLOSE')}
+						onClick={() => disabledClose && handleOperation('CLOSE')}
 					>
 						关闭
 					</div>

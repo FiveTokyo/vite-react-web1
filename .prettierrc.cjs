@@ -34,5 +34,4 @@ module.exports = {
 	htmlWhitespaceSensitivity: 'css',
 	// 换行符使用 auto
 	endOfLine: 'auto',
-	plugins: [require('prettier-plugin-tailwindcss')]
 }

@@ -5,7 +5,6 @@ import { ItemType, SubMenuType } from 'antd/lib/menu/hooks/useItems'
 import { LazyExoticComponent, ReactNode, Suspense } from 'react'
 import { cloneDeep, isObject } from 'lodash-es'
 
-import { Items } from '../context/router'
 import { Link } from 'react-router-dom'
 import { ProcessLoading } from '@/components/Loading'
 
@@ -68,71 +67,6 @@ function isPushLeftItems(route: RouteConfig) {
 	}
 
 	return true
-}
-
-// 分离路由，筛选出需要left，和top分开渲染的路由
-function deepSeparate(args: DeepSeparateArgs) {
-	const { route, leftItems, topItems, parentPath, routeAccess } = args
-	const { name, layout, children, path, access } = route
-
-	// 无权限
-	if (access && !routeAccess[access]) return
-
-	// 如果不存在名字 || 不需要布局
-	if (!name || layout === false) return
-
-	const curPath = `${parentPath}/${path!}`
-
-	const o = addItem({
-		route,
-		curPath
-	})
-
-	const isLeft = isPushLeftItems(route)
-	const isTop = isPushTopItems(route)
-
-	isLeft && leftItems?.push(cloneDeep(o))
-	isTop && topItems?.push(cloneDeep(o))
-
-	const lastLeftItem = leftItems?.at(-1) as SubMenuType
-	const lastTopItem = topItems?.at(-1) as SubMenuType
-
-	const nextLeftItems = lastLeftItem?.children
-	const nextTopItems = lastTopItem?.children
-
-	children?.forEach(child => {
-		const args: DeepSeparateArgs = {
-			route: child,
-			parentPath: curPath,
-			leftItems: nextLeftItems,
-			topItems: nextTopItems,
-			routeAccess
-		}
-		!isLeft && delete args.leftItems
-		!isTop && delete args.topItems
-		deepSeparate(args)
-	})
-}
-
-// 获取菜单配置项
-export function getItems(layoutReoutes: Routes, routeAccess: Record<string, boolean>) {
-	// 找到layout需要使用的路由配置
-	const leftItems: Items = []
-	const topItems: Items = []
-	layoutReoutes.forEach(route => {
-		deepSeparate({
-			route,
-			leftItems,
-			topItems,
-			parentPath: '',
-			routeAccess
-		})
-	})
-
-	return {
-		leftItems,
-		topItems
-	}
 }
 
 // 过滤路由配置权限

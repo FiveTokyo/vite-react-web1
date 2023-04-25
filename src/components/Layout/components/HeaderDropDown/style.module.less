@@ -1,0 +1,43 @@
+/**
+ * @author tokyo
+ * @date 2023-04-23 15:08
+ * @since 0.0.0
+ */
+@import '@/styles/base';
+.userInfo {
+	text-align: right;
+	cursor: pointer;
+	height: @header-height;
+	margin-left: 50px;
+	background-color: #dadada;
+	box-sizing: border-box;
+	/* .flexVerticalCenter(); */
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	border-radius: 2px;
+	transition: all 0.25s;
+	color: rgba(0, 0, 0, 0.6);
+	&:hover {
+		opacity: 0.8;
+		color: dodgerblue;
+	}
+}
+
+.info {
+	/* .flexVerticalCenter(); */
+	display: flex;
+	align-items: center;
+}
+
+.userName {
+	margin-left: 8px;
+	max-width: 66px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.icon {
+	margin-left: 5px;
+}

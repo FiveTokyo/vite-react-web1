@@ -1,7 +1,7 @@
 import HeaderRight from '@/components/HeaderRight'
 import IconLogo from '@/assets/img/logo.svg'
 import { InitialStateType } from '@/core/context/global'
-import { LayoutProProps } from '@/core/Layout'
+import { LayoutProProps } from '@/components/Layout'
 // import { reqGetUserInfo } from '@/api'
 
 // layout配置
