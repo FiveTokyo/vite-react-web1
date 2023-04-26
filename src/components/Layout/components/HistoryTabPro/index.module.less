@@ -1,10 +1,30 @@
 @import '@/styles/base';
 .tabsPro {
 	// width: 100%;
-	padding-left: 18px;
+	margin-left: 18px;
 	height: @header-height;
-	overflow-x: hidden;
-	flex: 1;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	&::-webkit-scrollbar{
+		width:1px;
+		height:1px;
+		/**/
+	}
+	&::-webkit-scrollbar-track{
+		background: #c1c1c1;
+		border-radius:2px;
+	}
+	&::-webkit-scrollbar-thumb{
+		background: #444;
+		border-radius: 2px;
+	}
+	&::-webkit-scrollbar-thumb:hover{
+		background: #999;
+	}
+	&::-webkit-scrollbar-corner{
+		background: #204754;
+	}
+	
 }
 
 .contextMenu {
@@ -49,7 +69,8 @@
 .group {
 	display: flex;
 	align-items: center;
-	// overflow-x: scroll;
+	width: max-content;
+	flex: 1;
 }
 .item {
 	padding: 0px 30px 0 20px;

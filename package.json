@@ -7,8 +7,8 @@
 		"build:test": "tsc && vite build --mode test",
 		"build": "tsc && vite build  --mode production",
 		"preview": "vite preview",
+		"prepare": "husky install",
 		"lint-staged": "lint-staged",
-		"prepare": "node ./prepare.js",
 		"lint:js": "eslint **/*.{js,jsx,ts,tsx}",
 		"lint:style": "stylelint --fix **/*.css"
 	},

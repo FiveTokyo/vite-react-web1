@@ -45,7 +45,6 @@ const LayoutPro = withRouter(props => {
 	const { location } = props
 	const layoutRoutes = routes.find(item => item.path === '/*')?.children || []
 	const Outlet = useOutlet()
-	console.log(Outlet)
 
 	const [menuState, setMenuState] = useState<MenuState>({
 		openKeys: [],

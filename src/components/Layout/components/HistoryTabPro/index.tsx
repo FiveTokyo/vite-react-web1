@@ -7,7 +7,6 @@ import styles from './index.module.less'
 import ResizeObserver from 'rc-resize-observer'
 import classNames from 'classnames'
 import { cloneDeep, isEmpty } from 'lodash-es'
-import { useClickAway, useSize } from 'ahooks'
 import { CacheEle } from '@/core/Router/KeepAlive'
 import { CloseOutlined, EllipsisOutlined } from '@ant-design/icons'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -65,6 +64,11 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 			}
 			const _items = [...items, o]
 			setItems(_items)
+		}
+		const target = document.getElementById(`history-item-tab-${pathname}`) as HTMLElement
+
+		if (target) {
+			target.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' })
 		}
 		setActiveKey(pathname)
 	}, [pathname])
@@ -198,6 +202,7 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 						className={classNames(styles.item, item.key === activeKey && styles.checked)}
 						// style={{ minWidth: `max-content` }}
 						onContextMenu={e => onContextChange(e, item)}
+						id={`history-item-tab-${item.key}`}
 						onClick={() => item.key !== pathname && onChange(item.key)}
 						{...provided.draggableProps}
 						{...provided.dragHandleProps}
@@ -239,7 +244,7 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 	}
 	return (
 		<>
-			<div className={styles.tabsPro}>
+			<div className={styles.tabsPro} id={`history-tabs-group`}>
 				<DragDropContext onDragEnd={onDragEnd}>
 					<Droppable droppableId="group" direction="horizontal">
 						{provided => {
@@ -247,8 +252,8 @@ const HistoryTabPro = withRouter<HistoryTabProProps>(props => {
 								<div
 									ref={provided.innerRef}
 									className={styles.group}
+									
 									{...provided.droppableProps}
-									style={{left: `${translateX}px`}}
 								>
 									{/* @ts-ignore */}
 									<List />
