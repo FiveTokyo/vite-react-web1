@@ -8,15 +8,15 @@ import CryptoJS from 'crypto-js';
 import myPackage from '../../package.json';
 
 let prefix = 'other_env'
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.MODE === 'development') {
 	prefix = 'dev'
-} else if (process.env.NODE_ENV === 'test') {
+} else if (import.meta.env.MODE === 'test') {
 	prefix = 'test'
-} else if (process.env.NODE_ENV === 'production') {
+} else if (import.meta.env.MODE === 'production') {
 	prefix = 'prd'
 }
-
-const isPrd = process.env.NODE_ENV === 'production'
+//除了正式环境其他环境都不加密
+const isPrd = import.meta.env.MODE === 'production'
 
 //环境+项目名+版本号+缓存名
 const prev = prefix + '_' + myPackage.name + '_' + myPackage.version + '_';
@@ -28,7 +28,7 @@ export function setLocal(name: string, value: string | undefined = '') {
 
 export function getLocal(name: string) {
 	const result = localStorage.getItem(prev + name);
-	if (!result) return null
+	if (!result) return ""
 	return isPrd ? decryptByAES(result) : result
 }
 
@@ -43,7 +43,7 @@ export function setSession(name: string, value: string | undefined = '') {
 
 export function getSession(name: string) {
 	const result = sessionStorage.getItem(prev + name);
-	if (!result) return null
+	if (!result) return ""
 	return isPrd ? decryptByAES(result) : result
 }
 

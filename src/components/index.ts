@@ -1,1 +1,2 @@
-export { default as Layout } from './Layout'
+export { default as Layout } from './JMLayout'
+export { default as JMTable } from './JMTable'

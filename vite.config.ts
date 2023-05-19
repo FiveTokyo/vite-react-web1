@@ -1,12 +1,12 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import legacy from '@vitejs/plugin-legacy'
-import proxyTarget from './src/config/proxy'
 import svgrPlugin from 'vite-plugin-svgr'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+	const env = loadEnv(mode, process.cwd());
 	return {
 		envPrefix: 'VITE_',
 		resolve: {
@@ -28,8 +28,8 @@ export default defineConfig(({ mode }) => {
 			port: 3000,
 			open: true,
 			proxy: {
-				'/user': {
-					target: proxyTarget.user,
+				'/api': {
+					target: env.VITE_API_BASE_URL,
 					changeOrigin: true,
 					ws: true
 				}

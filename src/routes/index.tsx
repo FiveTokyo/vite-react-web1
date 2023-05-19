@@ -1,6 +1,6 @@
 import { Navigate, RouteObject } from 'react-router-dom'
 
-import { RouteConfig } from '@/core/Router/type'
+import { RouteConfig } from '@/components/Router/type'
 import { lazy } from 'react'
 import {
 	BoldOutlined,
@@ -8,12 +8,12 @@ import {
 	ThunderboltOutlined,
 	CalendarOutlined
 } from '@ant-design/icons'
-import { lazyLoad } from '@/core/Router/utils'
+import { lazyLoad } from '@/components/Router/utils'
 
 const routes: RouteConfig[] = [
 	{
 		path: '/*',
-		element: lazyLoad(lazy(() => import('@/components/Layout'))),
+		element: lazyLoad(lazy(() => import('@/components/JMLayout'))),
 		children: [
 			{
 				index: true,
@@ -23,9 +23,6 @@ const routes: RouteConfig[] = [
 				path: 'parent',
 				name: '仅在左边显示',
 				icon: <BoldOutlined />,
-				layout: {
-					topItemRender: false
-				},
 				children: [
 					{
 						path: 'child1',
@@ -36,6 +33,7 @@ const routes: RouteConfig[] = [
 					{
 						path: 'child2',
 						name: '子组件2',
+						keepAlive: true,
 						element: lazyLoad(lazy(() => import('@/pages/parent/Child2')))
 					}
 				]
@@ -44,9 +42,6 @@ const routes: RouteConfig[] = [
 				path: 'head',
 				name: '仅在头部显示',
 				icon: <ThunderboltOutlined />,
-				layout: {
-					leftItemRender: false
-				},
 				children: [
 					{
 						path: 'head1',
@@ -73,12 +68,12 @@ const routes: RouteConfig[] = [
 							{
 								path: 'commo2n2',
 								name: '共有共有1',
-								element: <div>共有1</div>
+								element: <div style={{color: 'red'}}>共有1</div>
 							},
 							{
 								path: 'commo2n21',
 								name: '共有共有2',
-								element: <div>共有2</div>
+								element: <div style={{color: 'red'}}>共有2</div>
 							}
 						]
 					},
@@ -119,4 +114,8 @@ const routes: RouteConfig[] = [
 	{ path: '*', element: lazyLoad(lazy(() => import('@/pages/notFound'))) }
 ]
 
-export default routes 
+//获取路由之前处理
+export function getRoutesBefore(): RouteObject[] {
+	return routes as RouteObject[]
+}
+export default routes

@@ -1,0 +1,6 @@
+declare module '*/Setting/JMTableSetting'
+declare module '*/use-antd-resizable-header/index'
+declare module '*/AutoHeightTable'
+declare module '*/Search/JMSearch'
+declare module '*/Search/TableInlineSearch'
+declare module '*/Pagination/JMPagination'
