@@ -1,4 +1,3 @@
-import HeaderRight from '@/components/JMLayout/components/HeaderRight'
 import IconLogo from '@/assets/img/logo.svg'
 // import { reqGetUserInfo } from '@/api'
 

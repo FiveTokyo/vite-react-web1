@@ -1,16 +1,22 @@
 // 浏览足迹页签
-import { Dispatch, memo, useEffect, useRef, useState } from 'react'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import ReactDOM from 'react-dom'
-import { TabsProps } from 'antd'
+import { Dispatch, cloneElement, memo, useEffect, useMemo, useState } from 'react'
+import { Dropdown, Tabs, TabsProps } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
-import routes from '@/routes'
-import { cloneDeep, isEmpty } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { CacheEle } from '@/components/Router/KeepAlive'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { searchRoute } from '@/components/Router/utils'
+import { CSS } from '@dnd-kit/utilities'
+import { css } from '@emotion/css'
 import classNames from 'classnames'
 import styles from './index.module.less'
+import { DndContext, DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
+import {
+	SortableContext,
+	arrayMove,
+	horizontalListSortingStrategy,
+	useSortable
+} from '@dnd-kit/sortable'
 
 type OperationType = 'RELOAD' | 'CLOSE' | 'CLOSE_LEFT' | 'CLOSE_RIGHT' | 'CLOSE_OTHER'
 
@@ -18,76 +24,109 @@ type GetArrayValue<T> = T extends (infer P)[] ? P : never
 
 type Item = GetArrayValue<Required<TabsProps>['items']>
 
+interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
+	'data-node-key': string
+	onActiveBarTransform: (className: string) => void
+}
+
+export const DraggableTabNode = ({
+	className,
+	onActiveBarTransform,
+	...props
+}: DraggableTabPaneProps) => {
+	const { attributes, listeners, setNodeRef, transform, transition, isSorting } =
+		useSortable({
+			id: props['data-node-key']
+		})
+
+	const style: React.CSSProperties = {
+		...props.style,
+		transform: CSS.Transform.toString(transform),
+		transition,
+		cursor: 'move'
+	}
+
+	useEffect(() => {
+		if (!isSorting) {
+			onActiveBarTransform('')
+		} else if (className?.includes('ant-tabs-tab-active')) {
+			onActiveBarTransform(
+				css`
+					.ant-tabs-ink-bar {
+						transform: ${CSS.Transform.toString(transform)};
+						transition: ${transition} !important;
+					}
+				`
+			)
+		}
+	}, [className, isSorting, transform])
+
+	return cloneElement(props.children as React.ReactElement, {
+		ref: setNodeRef,
+		style,
+		...attributes,
+		...listeners
+	})
+}
 export interface HistoryTabProProps {
 	cacheEleList: CacheEle[]
 	setCacheEleList: Dispatch<React.SetStateAction<CacheEle[]>>
-	maxLength?: number
 }
-let a: any = null
 
 const HistoryTabPro = (props: HistoryTabProProps) => {
-	const { cacheEleList, setCacheEleList, maxLength = 10 } = props
-
+	const { cacheEleList, setCacheEleList } = props
 	const location = useLocation()
 	const navigate = useNavigate()
-
-	const contextMenuRef = useRef<any>({})
-
+	const params = useParams()
 	const { pathname } = location
 
 	const [activeKey, setActiveKey] = useState(pathname)
 	const [items, setItems] = useState<Item[]>([])
-	const [pos, setPos] = useState<{ x: number; y: number; item: Item }>()
+	const [pos, setPos] = useState<Item>()
 
-	//移动尝试
-	const [translateX, setTranslateX] = useState(0)
+	const [dropdownKey, setDropdownKey] = useState<string>('')
 
-	//移动尝试
+	const [className, setClassName] = useState('')
 
-	// useClickAway(() => setPos(undefined), tabsRef, ['mousedown'])
-
-	// const size = useSize(tabsRef)
-
-	useEffect(() => {
-		document.addEventListener('mousedown', (e: any) => handleClick(e), false)
-		return () => {
-			document.removeEventListener('mousedown', (e: any) => handleClick(e), false)
-		}
-	}, [])
-
-	const handleClick = (e: { target: Node | null }) => {
-		const target = ReactDOM.findDOMNode(contextMenuRef.current) as any
-		if (!target?.contains(e.target)) {
-			setPos(undefined)
-		}
-	}
+	const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
 
 	useEffect(() => {
 		// 判断是否添加
+		const param = { ...params }
+		delete param['*']
 		const idx = items.findIndex(item => item.key === pathname)
 		if (idx === -1) {
-			const route = searchRoute(pathname, routes)
+			const route = searchRoute(pathname)
 			const { name, element } = route
 			if (!name || !element) return
 			const o = {
 				key: pathname,
 				label: name
 			}
+			const paramKeys = Object.keys(param)
+			if (paramKeys.length > 0) {
+				o.label = o.label + '-' + param[paramKeys[paramKeys.length - 1]]
+			}
 			const _items = [...items, o]
 			setItems(_items)
 		}
-		const target = document.getElementById(`history-item-tab-${pathname}`) as HTMLElement
-
-		if (target) {
-			target.scrollIntoView({ block: 'end', inline: 'nearest', behavior: 'smooth' })
-		}
 		setActiveKey(pathname)
-	}, [pathname])
+	}, [pathname, params])
 
 	const onChange = (newActiveKey: string) => {
 		pos && setPos(undefined)
 		setActiveKey(newActiveKey)
 		navigate(newActiveKey)
+	}
+
+	const onDragEnd = ({ active, over }: DragEndEvent) => {
+		if (active.id !== over?.id) {
+			setItems(prev => {
+				const activeIndex = prev.findIndex(i => i.key === active.id)
+				const overIndex = prev.findIndex(i => i.key === over?.id)
+				return arrayMove(prev, activeIndex, overIndex)
+			})
+		}
 	}
 
 	const remove = (targetKey: string) => {
@@ -106,18 +145,6 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 		setActiveKey(newActiveKey)
 		navigate(newActiveKey)
 		// 删除缓存的dom
-	}
-
-	function onContextChange(event: any, item: Item) {
-		event.preventDefault()
-		// 如果不是当前活跃的tab，不弹出菜单
-		// if (item.key !== pathname) return
-		const { pageX, pageY } = event
-		setPos({
-			x: pageX,
-			y: pageY,
-			item: item
-		})
 	}
 
 	const OPERATION_MAP = new Map([
@@ -140,10 +167,10 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 			'CLOSE',
 			() => {
 				// 删除此tab
-				remove(pos!.item.key)
+				remove(pos!.key)
 				// 清除缓存
 				const newList = [...cacheEleList]
-				const idx = newList.findIndex(cache => cache.key === pos!.item.key)
+				const idx = newList.findIndex(cache => cache.key === pos!.key)
 				newList.splice(idx, 1)
 				setCacheEleList(newList)
 			}
@@ -152,7 +179,7 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 			'CLOSE_LEFT',
 			() => {
 				const _items = [...items]
-				const idx = _items.findIndex(item => item.key === pos!.item.key)
+				const idx = _items.findIndex(item => item.key === pos!.key)
 				const newItems = _items.slice(idx)
 				// 清除缓存
 				const newList = [...cacheEleList].filter(cache =>
@@ -170,7 +197,7 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 			'CLOSE_RIGHT',
 			() => {
 				const _items = [...items]
-				const idx = _items.findIndex(item => item.key === pos!.item.key)
+				const idx = _items.findIndex(item => item.key === pos!.key)
 				const newItems = _items.slice(0, idx + 1)
 				// 清除缓存
 				const newList = [...cacheEleList].filter(cache =>
@@ -197,126 +224,119 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 		]
 	])
 
-	function handleOperation(type: OperationType) {
-		const fn = OPERATION_MAP.get(type)
-		fn?.()
-		setPos(undefined)
-	}
 	// 是否可以关闭此卡片
 	const disabledClose = items.length > 1
 	// 是否禁用关闭左侧
-	const disabledCloseLeft = items[0]?.key === pos?.item.key
+	const disabledCloseLeft = items[0]?.key === pos?.key || items.length === 1
 	// 是否禁用关闭右侧
-	const disabledCloseRight = items.at(-1)?.key === pos?.item.key
+	const disabledCloseRight = items.at(-1)?.key === pos?.key
 	// 是否禁用关闭其他
 	const disabledCloseOther = items.length <= 1
 
-	// 列表组件
-	const List = () =>
-		items.map((item, index) => (
-			<Draggable key={item.key} draggableId={item.key} index={index}>
-				{provided => (
-					<div
-						ref={provided.innerRef}
-						className={classNames(styles.item, item.key === activeKey && styles.checked)}
-						// style={{ minWidth: `max-content` }}
-						onContextMenu={e => onContextChange(e, item)}
-						id={`history-item-tab-${item.key}`}
-						onClick={() => item.key !== pathname && onChange(item.key)}
-						{...provided.draggableProps}
-						{...provided.dragHandleProps}
-					>
-						<div className="tw-truncate">{item.label}</div>
-						{disabledClose && (
-							<CloseOutlined
-								className={styles.closeIcon}
-								onClick={e => {
-									e.stopPropagation()
-									remove(item.key)
-								}}
-							/>
-						)}
-					</div>
-				)}
-			</Draggable>
-		))
+	const dropdownMenus = useMemo(() => {
+		return [
+			{
+				key: 'CLOSE_LEFT',
+				label: '关闭左侧',
+				disabled: disabledCloseLeft
+			},
+			{
+				key: 'CLOSE_RIGHT',
+				label: '关闭右侧',
+				disabled: disabledCloseRight
+			},
+			{
+				key: 'CLOSE_OTHER',
+				label: '关闭其他',
+				disabled: disabledCloseOther
+			},
+			{
+				label: '添加为常用菜单',
+				key: 'fixed'
+			},
+			{
+				key: 'RELOAD',
+				label: '刷新',
+				disabled: pos?.key !== pathname
+			}
+		]
+	}, [pos, pathname, items])
 
-	const reorder = (list: Item[], startIndex: number, endIndex: number) => {
-		const result = Array.from(list)
-		const [removed] = result.splice(startIndex, 1)
-		result.splice(endIndex, 0, removed)
-
-		return result
-	}
-
-	// 监听拖拽移动
-	function onDragEnd(result: Record<string, any>) {
-		if (!result.destination) return
-
-		const endIdx = result.destination.index
-		const startIdx = result.source.index
-
-		if (startIdx === endIdx) return
-
-		const newItems = reorder(items, startIdx, endIdx)
-		setItems(newItems)
-	}
-	return (
-		<>
-			<div className={styles.tabsPro} id={`history-tabs-group`}>
-				<DragDropContext onDragEnd={onDragEnd}>
-					<Droppable droppableId="group" direction="horizontal">
-						{provided => {
-							return (
-								<div
-									ref={provided.innerRef}
-									className={styles.group}
-									{...provided.droppableProps}
-								>
-									{/* @ts-ignore */}
-									<List />
-									{provided.placeholder}
-								</div>
-							)
-						}}
-					</Droppable>
-				</DragDropContext>
-
+	const historyTabs = useMemo(() => {
+		return items.map(item => {
+			const content = (
 				<div
-					className={classNames(styles.contextMenu, isEmpty(pos) && styles.hide)}
-					style={isEmpty(pos) ? {} : { top: pos.y, left: pos.x }}
-					ref={contextMenuRef}
+					className={classNames(styles.item, item.key === activeKey && styles.checked)}
+					onClick={() => item.key !== pathname && onChange(item.key)}
 				>
-					{pos?.item.key === pathname && (
-						<div onClick={() => handleOperation('RELOAD')}>刷新</div>
+					<div>{item.label}</div>
+					{disabledClose && (
+						<CloseOutlined
+							className={styles.closeIcon}
+							onClick={e => {
+								e.stopPropagation()
+								remove(item.key)
+							}}
+						/>
 					)}
-					<div
-						className={classNames(!disabledClose && styles.disabled)}
-						onClick={() => disabledClose && handleOperation('CLOSE')}
-					>
-						关闭
-					</div>
-					<div
-						className={classNames(disabledCloseLeft && styles.disabled)}
-						onClick={() => !disabledCloseLeft && handleOperation('CLOSE_LEFT')}
-					>
-						关闭左侧
-					</div>
-					<div
-						className={classNames(disabledCloseRight && styles.disabled)}
-						onClick={() => !disabledCloseRight && handleOperation('CLOSE_RIGHT')}
-					>
-						关闭右侧
-					</div>
-					<div
-						className={classNames(disabledCloseOther && styles.disabled)}
-						onClick={() => !disabledCloseOther && handleOperation('CLOSE_OTHER')}
-					>
-						关闭其他
-					</div>
 				</div>
-			</div>
-		</>
+			)
+			return {
+				...item,
+				label:
+					dropdownKey === item.key ? (
+						<Dropdown
+							trigger={['contextMenu']}
+							menu={{
+								items: dropdownMenus,
+								onClick: ({ key }) => {
+									OPERATION_MAP.get(key as OperationType)?.()
+								}
+							}}
+							onOpenChange={() => {
+								setPos(item)
+								setDropdownKey(item.key)
+							}}
+							placement="bottom"
+						>
+							{content}
+						</Dropdown>
+					) : (
+						{ content }
+					)
+			}
+		})
+	}, [items, activeKey, dropdownMenus, dropdownKey])
+
+	return (
+		<div className={styles.tabsPro}>
+			<Tabs
+				className={`${className} ${styles.headerMenuTabs}`}
+				items={historyTabs}
+				tabBarGutter={0}
+				tabBarStyle={{ height: '100%' }}
+				renderTabBar={(tabBarProps, DefaultTabBar) => (
+					<DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+						<SortableContext
+							items={items.map(i => i.key)}
+							strategy={horizontalListSortingStrategy}
+						>
+							<DefaultTabBar {...tabBarProps}>
+								{node => (
+									<DraggableTabNode
+										{...node.props}
+										key={node.key}
+										onActiveBarTransform={setClassName}
+									>
+										{node}
+									</DraggableTabNode>
+								)}
+							</DefaultTabBar>
+						</SortableContext>
+					</DndContext>
+				)}
+			/>
+		</div>
 	)
 }
 

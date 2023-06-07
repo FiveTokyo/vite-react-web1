@@ -5,70 +5,10 @@ import { ItemType, SubMenuType } from 'antd/lib/menu/hooks/useItems'
 import { LazyExoticComponent, ReactNode, Suspense } from 'react'
 import { cloneDeep, isObject } from 'lodash-es'
 
-import { Link } from 'react-router-dom'
+import { Link, matchPath, useMatch, useParams } from 'react-router-dom'
 import { ProcessLoading } from '@/components/Loading'
 import { removeAllPendingRequestsRecord } from '@/api/request'
-
-// 添加item项
-function addItem(args: AddItemArgs) {
-	const { curPath, route } = args
-	const { name, icon, children } = route
-
-	const o: ItemType = {
-		key: curPath,
-		label: Array.isArray(children) ? name : <Link to={curPath}>{name}</Link>,
-		children: []
-	}
-	if (icon) {
-		o.icon = icon
-	}
-	if (!children || !children?.length) {
-		// @ts-ignore
-		delete o.children
-	}
-	return o
-}
-
-// 是否添加到topItems
-function isPushTopItems(route: RouteConfig) {
-	const { layout } = route
-
-	if ('layout' in route) {
-		if (isObject(layout)) {
-			// 不渲染左侧sider组件，肯定不加leftItems
-			if ('headerRender' in layout && layout.headerRender === false) {
-				return false
-			}
-
-			// 不渲染
-			if ('topItemRender' in layout && layout.topItemRender === false) {
-				return false
-			}
-		}
-	}
-	return true
-}
-
-// 是否添加到leftItems
-function isPushLeftItems(route: RouteConfig) {
-	const { layout } = route
-
-	if ('layout' in route) {
-		if (isObject(layout)) {
-			// 不渲染左侧sider组件，肯定不加leftItems
-			if ('leftSiderRender' in layout && layout.leftSiderRender === false) {
-				return false
-			}
-
-			// 不渲染
-			if ('leftItemRender' in layout && layout.leftItemRender === false) {
-				return false
-			}
-		}
-	}
-
-	return true
-}
+import routes from '@/routes'
 
 // 过滤路由配置权限
 // export function filterRoutesAccess(routes: Routes, checkFn: (access: string) => boolean) {
@@ -117,19 +57,23 @@ export const lazyLoad = (Com: LazyExoticComponent<any>): ReactNode => {
  * @param {Array} routes 路由列表
  * @returns RouteConfig
  */
-export const searchRoute = (aimPath: string, routes: Routes): RouteConfig => {
-	const lastStr = aimPath.split('/').at(-1)
-	const _deep = (routes: Routes) => {
+export const searchRoute = (pathname: string): RouteConfig => {
+	//处理动态路由
+	const _deep = (routes: RouteConfig[], name = '') => {
 		let result: RouteConfig = {}
 		for (let i = 0; i < routes.length; i++) {
 			const item = routes[i]
-			if (item.path === lastStr) return item
+			const prev = name + '/'
+			if (
+				matchPath({ path: prev + item.path, end: true, caseSensitive: false }, pathname)
+			)
+				return { ...item, key: prev + item.path }
 			if (item.children?.length) {
-				const res = _deep(item.children)
+				const res = _deep(item.children, prev + item.path)
 				if (Object.keys(res).length) result = res
 			}
 		}
 		return result
 	}
-	return _deep(routes)
+	return _deep(routes.find(item => item.path === '/*')?.children || [])
 }

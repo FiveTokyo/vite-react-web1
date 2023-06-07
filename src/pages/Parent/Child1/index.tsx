@@ -3,7 +3,7 @@ import { JMTable } from '@/components'
 import { Input } from 'antd'
 import { FC } from 'react'
 
-const Child1: FC<{}> = () => {
+const Child1 = () => {
 	return (
 		<>
 			<div className="tw-bg-primary tw-font-bold">开启了keepAlive</div>
@@ -16,7 +16,7 @@ const Child1: FC<{}> = () => {
 						transformSearch: () => ({}),
 						onDiyCell: (record, index, settingCols) => {
 							return <div>sdasd</div>	
-						}
+						},
 					},
 					{ dataIndex: 'test1', title: '测试1' }
 				]}

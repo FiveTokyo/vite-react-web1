@@ -2,7 +2,7 @@
 
 import { Avatar, Button, Popover, Space, Typography } from 'antd'
 
-import { FC, useRef } from 'react'
+import { FC } from 'react'
 import styles from './index.module.css'
 // import { reqLoginOut } from '@/api'
 import { useNavigate } from 'react-router-dom'

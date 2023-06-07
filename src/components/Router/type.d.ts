@@ -15,19 +15,11 @@ interface RouteExtension {
 	access?: string
 	/* 是否要开启keep-alive, 默认是false */
 	keepAlive?: boolean
-	/* layout布局相关，默认true */
-	layout?:
-		| boolean
-		| {
-				/* 渲染左边的sider组件 */
-				leftSiderRender?: boolean
-				/* 是否渲染到左边的菜单项中 */
-				leftItemRender?: boolean
-				/* 是否渲染头部header组件 */
-				headerRender?: boolean
-				/* 是否渲染到头部的菜单项目中 */
-				topItemRender?: boolean
-		  }
+	/* 是否在菜单栏显示，默认true */
+	layout?: boolean
+	key?: string
+	//菜单隐藏
+	hideInMenu?: boolean
 	/* 扩展的children */
 	children?: RouteConfig[]
 }

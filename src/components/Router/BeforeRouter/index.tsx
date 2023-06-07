@@ -2,7 +2,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import routes from '@/routes'
 import { searchRoute } from '../utils'
-import { isEmpty } from 'lodash-es'
 import { ReactElement, memo } from 'react'
 import { getLocal } from '@/utils/storage'
 
@@ -13,8 +12,7 @@ export interface BeforeRouterProps {
 const BeforeRouter = (props: BeforeRouterProps) => {
 	const { children } = props
 	const { pathname } = useLocation()
-
-	const route = searchRoute(pathname, routes)
+	const route = searchRoute(pathname)
 	const { access } = route
 
 	// 判断是否登录

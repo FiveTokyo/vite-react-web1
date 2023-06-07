@@ -1,3 +1,4 @@
+import { getLocal } from '@/utils/storage';
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload, message, Space } from 'antd';
 import { UploadFile, UploadProps } from 'antd/es/upload';
@@ -124,7 +125,7 @@ const UploadImage: React.FC<UploadImageProps> = (props) => {
         multiple={true}
         name="upload"
         headers={{
-          token: localStorage.getItem('token') || '',
+          token: getLocal('token') || '',
         }}
         data={{
           filetype: 'image',

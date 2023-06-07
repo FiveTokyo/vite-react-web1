@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, memo, useState } from 'react'
 import KeepAlive, { CacheEle, KeepAliveProps } from '@/components/Router/KeepAlive'
 import { Content } from 'antd/es/layout/layout'
 import HistoryTabPro from '../HistoryTabPro'
@@ -17,7 +17,6 @@ const ContentPro: FC<ContentProProps> = props => {
 	const { maxLength, children } = props
 	// 缓存的元素节点数组
 	const [cacheEleList, setCacheEleList] = useState<CacheEle[]>([])
-
 	return (
 		<div className={styles.content}>
 			<div className={styles.header}>
@@ -37,4 +36,4 @@ const ContentPro: FC<ContentProProps> = props => {
 	)
 }
 
-export default ContentPro
+export default memo(ContentPro)

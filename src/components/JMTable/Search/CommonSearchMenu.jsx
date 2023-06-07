@@ -1,6 +1,7 @@
 import { Card, Select, message } from 'antd';
 import { useContext, useState } from 'react';
 import { JMTableContext } from '..';
+import { getLocal } from '@/utils/storage';
 
 const CommonSearchMenu = (props) => {
   const { saveKey, setCommonSearchCols: setSearchCols } =
@@ -10,7 +11,7 @@ const CommonSearchMenu = (props) => {
   const savePath = `${saveKey}_commonSearch`;
 
   const [selectValue, setSelectValue] = useState(() => {
-    const item = localStorage.getItem(savePath);
+    const item = getLocal(savePath);
     if (item) {
       return JSON.parse(item);
     }

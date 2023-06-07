@@ -3,6 +3,7 @@ import { BetaSchemaForm } from '@ant-design/pro-form';
 import { cloneDeep, debounce, pick } from 'lodash-es';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { JMTableContext } from '..';
+import { getLocal } from '@/utils/storage';
 
 const TableInlineSearch = (props) => {
   const {
@@ -19,7 +20,7 @@ const TableInlineSearch = (props) => {
   const formRef = useRef();
   const isSelfChange = useRef(false);
   const [columns, setColumns] = useState(() => {
-    const item = localStorage.getItem(savePath);
+    const item = getLocal(savePath);
     if (item) {
       return updateColumn(JSON.parse(item));
     }

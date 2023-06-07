@@ -51,8 +51,7 @@ function KeepAlive(props: KeepAliveProps) {
 		'setCacheEleList' in props ? props.setCacheEleList : setInternalCacheEleList
 
 	const isNonKeepAlive = useMemo(() => {
-		const layoutRoutes = routes.find(item => item.path === '/*')?.children || []
-		const { keepAlive } = searchRoute(location.pathname, layoutRoutes)
+		const { keepAlive } = searchRoute(pathname)
 		return !keepAlive
 	}, [pathname])
 
@@ -110,8 +109,8 @@ function Component(props: ComponentProps) {
 	useEffect(() => {
 		active
 			? container.current?.appendChild(targetElement)
-			: container.current?.removeChild(targetElement)
-	}, [active])
+			: (targetElement.parentNode && container.current?.removeChild(targetElement)) //有的会没有父元素开发环境保存就会报错添加个是否有父元素的判断
+	}, [active, targetElement])
 
 	return <>{createPortal(children, targetElement)}</>
 }

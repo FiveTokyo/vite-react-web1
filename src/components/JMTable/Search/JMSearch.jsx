@@ -25,6 +25,7 @@ import CommonSearchMenu from './CommonSearchMenu';
 import AddFilterMenu from './AddFilterMenu';
 import { isEmpty, debounce, merge, random, cloneDeep } from 'lodash-es';
 import { JMTableContext } from '..';
+import { getLocal } from '@/utils/storage';
 
 const SAVEKEY = 'sk-search';
 const JMSearch = forwardRef((props, ref) => {
@@ -71,7 +72,7 @@ const JMSearch = forwardRef((props, ref) => {
   if (!cols?.length) return <></>;
 
   function getSearchHistory() {
-    let item = localStorage.getItem(SAVEKEY);
+    let item = getLocal(SAVEKEY);
     return item ? JSON.parse(item) : {};
   }
 

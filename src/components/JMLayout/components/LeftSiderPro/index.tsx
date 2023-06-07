@@ -2,26 +2,23 @@
 
 import { Layout, Menu } from 'antd'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
-import { MenuState } from '../..'
-import { isFunction } from 'lodash-es'
 import styles from './index.module.less'
-import withRouter from '@/components/Router/withRouter'
 import { memo, useEffect, useMemo, useState } from 'react'
-import routes from '@/routes'
-import logo from '@/assets/img/logo.svg'
+import routers from '@/routes'
 import { ItemType } from 'antd/lib/menu/hooks/useItems'
 import { RouteConfig } from '@/components/Router/type'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { layoutSettings } from '@/config/defaultSetting'
+import { intersection, isEqual, uniq } from 'lodash-es'
+import { searchRoute } from '@/components/Router/utils'
 
 const { Sider } = Layout
 
-
 export interface LeftSiderProProps {
-	/* 修改菜单状态 */
-	menuState: MenuState
-	/* 修改菜单状态回调 */
-	onMenuStateChange: (curState: MenuState) => void
+	routes?: RouteConfig[]
+	siderWidth?: number
+	logo?: string
+	title?: string
 }
 
 function routesToMenu(routes: any, path: string = '') {
@@ -39,48 +36,76 @@ function routesToMenu(routes: any, path: string = '') {
 	return result
 }
 
-const LeftSiderPro = (props: LeftSiderProProps) => {
-	const {  menuState, onMenuStateChange } = props
+function getOpenKeys(location: ReturnType<typeof useLocation>) {
+	const { pathname } = location
+	const pathList = pathname?.split('/') || []
+	const keys = []
+	while (pathList.pop()) {
+		const prePath = pathList.join('/')
+		prePath && keys.push(prePath)
+	}
+	return keys
+}
 
+const LeftSiderPro = (props: LeftSiderProProps) => {
+	const {
+		routes = routers.find(r => r.path === '/*'),
+		siderWidth = 230,
+		logo = layoutSettings.logo,
+		title = layoutSettings.title
+	} = props
 	const location = useLocation()
+	const [openKeys, setOpenKeys] = useState<string[]>([])
+	const [selectedKeys, setSelectedKeys] = useState<string[]>([])
+
+	useEffect(() => {
+		if (selectedKeys[0] !== location.pathname) {
+			const item = searchRoute(location.pathname)
+			item && !item.hideInMenu && setSelectedKeys([item.key as string])
+		}
+		const newOpenKeys = uniq([...openKeys, ...getOpenKeys(location)])
+		if (!isEqual([...newOpenKeys], [...openKeys])) {
+			setOpenKeys(newOpenKeys)
+		}
+	}, [location.pathname])
+
 	const navigate = useNavigate()
 	const [collapsed, setCollapsed] = useState(false)
 
-	useEffect(() => {}, [location.pathname])
-
 	const menuItems: ItemType[] = useMemo(() => {
-		const manageRoutes = routes.find(r => r.path === '/*') as RouteConfig
-		const result = routesToMenu(manageRoutes)
+		const result = routesToMenu(routes)
 		return result
 	}, [routes])
 
 	function onOpenChange(openKeys: string[]) {
-		onMenuStateChange({ ...menuState, openKeys })
+		setOpenKeys(openKeys)
 	}
 
 	function onMenuClick({ key }: { key: string }) {
+		setSelectedKeys([key])
 		navigate(key)
-		// console.log('onMenuChange:', keys)
 	}
+
 	return (
 		<Sider
 			className={styles.sider}
 			collapsed={collapsed}
 			trigger={null}
+			width={siderWidth}
 			theme="dark"
 		>
 			<div className={styles.nav}>
-				<img src={layoutSettings.logo} alt="系统icon" />
-				{!collapsed && <span>{layoutSettings.title}</span>}
+				<img src={logo} alt="系统icon" />
+				{!collapsed && <span>{title}</span>}
 			</div>
 			<Menu
 				mode="inline"
+				className={styles['menu-border-none']}
 				items={menuItems}
 				theme="dark"
-				className={styles['menu-border-none']}
-				selectedKeys={menuState.selectedKeys}
+				selectedKeys={selectedKeys}
 				onClick={onMenuClick}
-				openKeys={menuState.openKeys}
+				openKeys={openKeys}
 				onOpenChange={onOpenChange}
 			/>
 			<div className={styles.collapsed} onClick={() => setCollapsed(!collapsed)}>

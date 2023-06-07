@@ -25,7 +25,7 @@ const routes: RouteConfig[] = [
 				icon: <BoldOutlined />,
 				children: [
 					{
-						path: 'child1',
+						path: 'child1/:id/:name',
 						name: '子组件1',
 						keepAlive: true,
 						element: lazyLoad(lazy(() => import('@/pages/parent/Child1')))
@@ -74,7 +74,58 @@ const routes: RouteConfig[] = [
 								path: 'commo2n21',
 								name: '共有共有2',
 								element: <div style={{color: 'red'}}>共有2</div>
-							}
+							},
+							{
+								path: 'commo2n21asd',
+								name: '共有共有2asdasdasd',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commo2n2da1',
+								name: '共有共有2asdasd',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commsado2n21',
+								name: '共有共有2asdasd',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commdadso2n21',
+								name: '共有共有2asdasda',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commdswao2n21',
+								name: '共有共有2sadsad',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							
+							{
+								path: 'commo2sdasn21',
+								name: '共有共有2sdasdasd',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commo2xzn21',
+								name: '共有共有2asdas',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commo2vdn21',
+								name: '共有共有2sadas',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commo2adn21',
+								name: '共有共有2a',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
+							{
+								path: 'commo2sadn21',
+								name: '共有共有2sda',
+								element: <div style={{color: 'red'}}>共有2</div>
+							},
 						]
 					},
 					{

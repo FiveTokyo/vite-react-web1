@@ -19,7 +19,6 @@ const App: FC = () => {
 
 	return (
 		<ConfigProvider locale={zhCN} theme={theme}>
-			{/* <div className="tw-border-line tw-bg-primary tw-text-tc-secondary/50">123</div> */}
 			<BeforeRouter>{element}</BeforeRouter>
 		</ConfigProvider>
 	)

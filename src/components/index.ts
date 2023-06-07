@@ -1,2 +1,7 @@
 export { default as Layout } from './JMLayout'
 export { default as JMTable } from './JMTable'
+export { default as JMModal } from './JMModal'
+export { default as JMInput } from './Input/JMInput'
+export { default as JMImage } from './Image/JMUploadImage'
+export { default as JMButton } from './Button/JMLoadingButton'
+export { default as Card } from './Card/JMSwitchCard'
