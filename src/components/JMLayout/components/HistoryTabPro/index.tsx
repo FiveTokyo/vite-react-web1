@@ -1,13 +1,11 @@
 // 浏览足迹页签
-import { Dispatch, cloneElement, memo, useEffect, useMemo, useState } from 'react'
+import { Dispatch, memo, useEffect, useMemo, useState } from 'react'
 import { Dropdown, Tabs, TabsProps } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash-es'
 import { CacheEle } from '@/components/Router/KeepAlive'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { searchRoute } from '@/components/Router/utils'
-import { CSS } from '@dnd-kit/utilities'
-import { css } from '@emotion/css'
 import classNames from 'classnames'
 import styles from './index.module.less'
 import { DndContext, DragEndEvent, PointerSensor, useSensor } from '@dnd-kit/core'
@@ -15,8 +13,9 @@ import {
 	SortableContext,
 	arrayMove,
 	horizontalListSortingStrategy,
-	useSortable
 } from '@dnd-kit/sortable'
+import DraggableTabNode from '@/components/DraggableTabNode'
+import { RouteConfig } from '@/components/Router/type'
 
 type OperationType = 'RELOAD' | 'CLOSE' | 'CLOSE_LEFT' | 'CLOSE_RIGHT' | 'CLOSE_OTHER'
 
@@ -24,57 +23,15 @@ type GetArrayValue<T> = T extends (infer P)[] ? P : never
 
 type Item = GetArrayValue<Required<TabsProps>['items']>
 
-interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
-	'data-node-key': string
-	onActiveBarTransform: (className: string) => void
-}
 
-export const DraggableTabNode = ({
-	className,
-	onActiveBarTransform,
-	...props
-}: DraggableTabPaneProps) => {
-	const { attributes, listeners, setNodeRef, transform, transition, isSorting } =
-		useSortable({
-			id: props['data-node-key']
-		})
-
-	const style: React.CSSProperties = {
-		...props.style,
-		transform: CSS.Transform.toString(transform),
-		transition,
-		cursor: 'move'
-	}
-
-	useEffect(() => {
-		if (!isSorting) {
-			onActiveBarTransform('')
-		} else if (className?.includes('ant-tabs-tab-active')) {
-			onActiveBarTransform(
-				css`
-					.ant-tabs-ink-bar {
-						transform: ${CSS.Transform.toString(transform)};
-						transition: ${transition} !important;
-					}
-				`
-			)
-		}
-	}, [className, isSorting, transform])
-
-	return cloneElement(props.children as React.ReactElement, {
-		ref: setNodeRef,
-		style,
-		...attributes,
-		...listeners
-	})
-}
 export interface HistoryTabProProps {
 	cacheEleList: CacheEle[]
 	setCacheEleList: Dispatch<React.SetStateAction<CacheEle[]>>
+	routes: RouteConfig[]
 }
 
 const HistoryTabPro = (props: HistoryTabProProps) => {
-	const { cacheEleList, setCacheEleList } = props
+	const { cacheEleList, setCacheEleList, routes } = props
 	const location = useLocation()
 	const navigate = useNavigate()
 	const params = useParams()
@@ -96,7 +53,10 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 		delete param['*']
 		const idx = items.findIndex(item => item.key === pathname)
 		if (idx === -1) {
-			const route = searchRoute(pathname)
+			const route = searchRoute(
+				pathname,
+				routes
+			)
 			const { name, element } = route
 			if (!name || !element) return
 			const o = {
@@ -262,7 +222,7 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 		]
 	}, [pos, pathname, items])
 
-	const historyTabs = useMemo(() => {
+	const historyTabs: { key: string; label: React.ReactNode }[] = useMemo(() => {
 		return items.map(item => {
 			const content = (
 				<div
@@ -302,9 +262,11 @@ const HistoryTabPro = (props: HistoryTabProProps) => {
 							{content}
 						</Dropdown>
 					) : (
-						{ content }
+						content
 					)
 			}
+		}).filter((item) => {
+			return item
 		})
 	}, [items, activeKey, dropdownMenus, dropdownKey])
 

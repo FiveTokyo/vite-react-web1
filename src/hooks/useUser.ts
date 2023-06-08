@@ -5,7 +5,7 @@ import { useAsyncEffect, useRequest } from "ahooks";
 import { useAtom } from "jotai";
 import { useState } from "react";
 
-export default function useGetUser() {
+export default function useCurrentUser() {
 	const [userInfo, setUserInfo] = useAtom(userInfoAtom)
 	const navigate = useNavigate()
 	const getUserInfo = async (): Promise<any> => {
@@ -15,7 +15,7 @@ export default function useGetUser() {
 
 	useAsyncEffect(async () => {
 		const auth = getLocal('token')
-		if (!auth && !userInfo.hasOwnProperty('id')) {
+		if (!auth && !userInfo.hasOwnProperty('name')) {
 			await getUserInfo()
 		}
 	}, [])
@@ -27,7 +27,7 @@ export default function useGetUser() {
 
 	const userLogout = async () => {
 		rmLocal('token')
-		navigate('user/login', { replace: true })
+		navigate('/login', { replace: true })
 	}
 
 	return { userInfo, updateUserInfo: getUserInfo, userLogin, userLogout }

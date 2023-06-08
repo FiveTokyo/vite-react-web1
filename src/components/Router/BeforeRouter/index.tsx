@@ -14,7 +14,6 @@ const BeforeRouter = (props: BeforeRouterProps) => {
 	const { pathname } = useLocation()
 	const route = searchRoute(pathname)
 	const { access } = route
-
 	// 判断是否登录
 	if (!getLocal('token') && route.path !== 'login') {
 		return <Navigate to="/login" replace />

@@ -54,15 +54,19 @@ export const lazyLoad = (Com: LazyExoticComponent<any>): ReactNode => {
 /**
  * @description 递归查询对应的路由
  * @param {String} path 当前访问地址
- * @param {Array} routes 路由列表
+ * @param {Array} routers 路由列表
  * @returns RouteConfig
  */
-export const searchRoute = (pathname: string): RouteConfig => {
+export const searchRoute = (
+	pathname: string,
+	routers: RouteConfig | RouteConfig[] = routes
+): RouteConfig => {
 	//处理动态路由
-	const _deep = (routes: RouteConfig[], name = '') => {
+	const _deep = (routes: (RouteConfig | RouteConfig[] ), name = '') => {
 		let result: RouteConfig = {}
-		for (let i = 0; i < routes.length; i++) {
-			const item = routes[i]
+		const _routes = Array.isArray(routes) ? routes : routes.children as RouteConfig[]
+		for (let i = 0; i < _routes.length; i++) {
+			const item = _routes[i]
 			const prev = name + '/'
 			if (
 				matchPath({ path: prev + item.path, end: true, caseSensitive: false }, pathname)
@@ -75,5 +79,5 @@ export const searchRoute = (pathname: string): RouteConfig => {
 		}
 		return result
 	}
-	return _deep(routes.find(item => item.path === '/*')?.children || [])
+	return _deep(routers || [])
 }

@@ -2,14 +2,12 @@ import { JMTable } from '@/components'
 import useGetUserInfo from '@/hooks/useUser'
 import { Button, Form, Input, message } from 'antd'
 // import { reqLogin } from '@/api'
-import { useSearchParams, useNavigate } from 'react-router-dom'
-console.log('import.meta.env.BASE_URL', import.meta.env)
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 	const navigate = useNavigate()
-	const [params] = useSearchParams()
-	const { userInfo, updateUserInfo } = useGetUserInfo()
-	console.log('params', params.get('a'), userInfo)
+	// const [params] = useSearchParams()
+	const { userLogin } = useGetUserInfo()
 	const onFinish = (values: any) => {
 		// reqLogin(values).then(res => {
 		// 	const { success, msg, data } = res
@@ -22,9 +20,10 @@ const Login = () => {
 		// 	}
 		// })
 		message.success('登录成功')
-		updateUserInfo()
+		userLogin()
 		setTimeout(() => navigate('/'), 500)
 	}
+
 	const cols = Array(10)
 		.fill(0)
 		.map((d, i) => ({
@@ -40,7 +39,7 @@ const Login = () => {
 					list: []
 				}}
 			/>
-			{/* <Form
+			<Form
 				name="basic"
 				labelCol={{ span: 8 }}
 				wrapperCol={{ span: 16 }}
@@ -73,7 +72,7 @@ const Login = () => {
 					</Button>
 					<Button className="tw-ml-[16px]">注册</Button>
 				</Form.Item>
-			</Form> */}
+			</Form>
 		</div>
 	)
 }

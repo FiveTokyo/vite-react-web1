@@ -5,29 +5,30 @@ import HistoryTabPro from '../HistoryTabPro'
 import styles from './index.module.less'
 import { useOutlet, useRoutes } from 'react-router-dom'
 import { Dropdown, Avatar, MenuProps } from 'antd'
-import HeaderDropDown from '../HeaderDropDown'
+import HeaderDropDown, { HeaderDropDownProps } from '../HeaderDropDown'
+import { RouteConfig } from '@/components/Router/type'
 
-export interface ContentProProps {
-	isTabs?: boolean
-	maxLength?: KeepAliveProps['maxLength']
+export type ContentProProps = HeaderDropDownProps & {
+	AliveMaxLength?: KeepAliveProps['AliveMaxLength']
 	children: ReturnType<typeof useRoutes>
+	routes: RouteConfig[]
 }
 
 const ContentPro: FC<ContentProProps> = props => {
-	const { maxLength, children } = props
+	const { AliveMaxLength, children, routes, userName, dropDownItems } = props
 	// 缓存的元素节点数组
 	const [cacheEleList, setCacheEleList] = useState<CacheEle[]>([])
 	return (
 		<div className={styles.content}>
 			<div className={styles.header}>
-				<HistoryTabPro cacheEleList={cacheEleList} setCacheEleList={setCacheEleList} />
-				<HeaderDropDown></HeaderDropDown>
+				<HistoryTabPro routes={routes} cacheEleList={cacheEleList} setCacheEleList={setCacheEleList} />
+				<HeaderDropDown userName={userName} dropDownItems={dropDownItems}></HeaderDropDown>
 			</div>
 			<Content>
 				<KeepAlive
 					cacheEleList={cacheEleList}
 					setCacheEleList={setCacheEleList}
-					maxLength={maxLength}
+					AliveMaxLength={AliveMaxLength}
 				>
 					{children}
 				</KeepAlive>

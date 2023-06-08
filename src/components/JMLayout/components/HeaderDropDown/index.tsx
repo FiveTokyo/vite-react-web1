@@ -22,14 +22,9 @@ interface HeaderDropDownRef {
 
 }
 */
-const items: MenuProps['items'] = [
-	{
-		key: '1',
-		label: <a>退出登陆</a>
-	}
-]
+
 const HeaderDropDown = (props: HeaderDropDownProps): ReactElement => {
-	const { dropDownItems = items, userName = '伍东京', avatar = <UserOutlined /> } = props
+	const { dropDownItems, userName, avatar = <UserOutlined /> } = props
 
 	return (
 		<div className={styles.userInfo}>

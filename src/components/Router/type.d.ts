@@ -12,7 +12,7 @@ interface RouteExtension {
 	/* 在菜单中显示的名称,如果没有name则不在菜单中显示 */
 	name?: string
 	/* 权限相关 */
-	access?: string
+	notAccess?: boolean
 	/* 是否要开启keep-alive, 默认是false */
 	keepAlive?: boolean
 	/* 是否在菜单栏显示，默认true */

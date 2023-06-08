@@ -15,22 +15,22 @@ import { searchRoute } from '@/components/Router/utils'
 const { Sider } = Layout
 
 export interface LeftSiderProProps {
-	routes?: RouteConfig[]
+	routes: RouteConfig[]
 	siderWidth?: number
 	logo?: string
 	title?: string
 }
 
-function routesToMenu(routes: any, path: string = '') {
-	let result = routes!.children
-		.filter((route: RouteConfig) => route.hasOwnProperty('name'))!
+function routesToMenu(routes: RouteConfig[], path: string = '') {
+	let result = routes
+		.filter((route: RouteConfig) => route.hasOwnProperty('path') && !route.hideInMenu && !route.notAccess)!
 		.map((route: RouteConfig) => {
 			const newPath = path + '/' + route.path
 			return {
 				key: newPath,
 				label: route.name,
 				icon: route.icon,
-				children: route.children && routesToMenu(route, newPath)
+				children: route.children && routesToMenu(route.children, newPath)
 			}
 		}) as ItemType[]
 	return result
@@ -48,19 +48,13 @@ function getOpenKeys(location: ReturnType<typeof useLocation>) {
 }
 
 const LeftSiderPro = (props: LeftSiderProProps) => {
-	const {
-		routes = routers.find(r => r.path === '/*'),
-		siderWidth = 230,
-		logo = layoutSettings.logo,
-		title = layoutSettings.title
-	} = props
+	const { routes = [], siderWidth, logo, title } = props
 	const location = useLocation()
 	const [openKeys, setOpenKeys] = useState<string[]>([])
 	const [selectedKeys, setSelectedKeys] = useState<string[]>([])
-
 	useEffect(() => {
-		if (selectedKeys[0] !== location.pathname) {
-			const item = searchRoute(location.pathname)
+		if (selectedKeys?.[0] || selectedKeys[0] !== location.pathname) {
+			const item = searchRoute(location.pathname, routes)
 			item && !item.hideInMenu && setSelectedKeys([item.key as string])
 		}
 		const newOpenKeys = uniq([...openKeys, ...getOpenKeys(location)])

@@ -20,24 +20,17 @@ export interface CacheEle {
 	ele: ReactElement<any, string | JSXElementConstructor<any>> | null
 }
 
-interface DefaultProps {
+interface AdditionalProps {
 	children: ReactElement<any, string | JSXElementConstructor<any>> | null
-	maxLength?: number
-}
-
-interface AdditionalProps extends DefaultProps {
-	children: ReactElement<any, string | JSXElementConstructor<any>> | null
-	maxLength?: number
+	AliveMaxLength?: number
 	cacheEleList: CacheEle[]
 	setCacheEleList: Dispatch<React.SetStateAction<CacheEle[]>>
 }
 
-export type KeepAliveProps = DefaultProps | AdditionalProps
+export type KeepAliveProps =  AdditionalProps
 
-function KeepAlive(props: DefaultProps): JSX.Element
-function KeepAlive(props: AdditionalProps): JSX.Element
 function KeepAlive(props: KeepAliveProps) {
-	const { children, maxLength = 10 } = props
+	const { children, AliveMaxLength = 10 } = props
 	const { pathname } = useLocation()
 
 	// 缓存的元素节点数组
@@ -61,7 +54,7 @@ function KeepAlive(props: KeepAliveProps) {
 		setCacheEleList(cacheList => {
 			const nextCacheList = [...cacheList]
 			// 如果超出限制，删除第一个
-			if (cacheList.length >= maxLength) {
+			if (cacheList.length >= AliveMaxLength) {
 				nextCacheList.shift()
 			}
 
@@ -75,7 +68,7 @@ function KeepAlive(props: KeepAliveProps) {
 				})
 			return nextCacheList
 		})
-	}, [children, maxLength])
+	}, [children, AliveMaxLength])
 
 	return (
 		<>
