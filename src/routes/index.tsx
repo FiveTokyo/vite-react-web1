@@ -8,12 +8,12 @@ import {
 	ThunderboltOutlined,
 	CalendarOutlined
 } from '@ant-design/icons'
-import { lazyLoad } from '@/components/Router/utils'
+import LazyLoad from '@/components/Router/LazyLoad'
 
 const routes: RouteConfig[] = [
 	{
 		path: '/*',
-		element: lazyLoad(lazy(() => import('@/components/JMLayout'))),
+		element: LazyLoad(lazy(() => import('@/components/JMLayout'))),
 		children: [
 			{
 				index: true,
@@ -28,13 +28,13 @@ const routes: RouteConfig[] = [
 						path: 'child1/:id/:name',
 						name: '子组件1',
 						keepAlive: true,
-						element: lazyLoad(lazy(() => import('@/pages/parent/Child1')))
+						element: LazyLoad(lazy(() => import('@/pages/parent/Child1')))
 					},
 					{
 						path: 'child2',
 						name: '子组件2',
 						keepAlive: true,
-						element: lazyLoad(lazy(() => import('@/pages/parent/Child2')))
+						element: LazyLoad(lazy(() => import('@/pages/parent/Child2')))
 					}
 				]
 			},
@@ -143,12 +143,12 @@ const routes: RouteConfig[] = [
 					{
 						path: 'sell',
 						name: '销售数据',
-						element: lazyLoad(lazy(() => import('@/pages/analyse/Sell')))
+						element: LazyLoad(lazy(() => import('@/pages/analyse/Sell')))
 					},
 					{
 						path: 'user',
 						name: '用户统计',
-						element: lazyLoad(lazy(() => import('@/pages/analyse/User')))
+						element: LazyLoad(lazy(() => import('@/pages/analyse/User')))
 					}
 				]
 			}
@@ -156,13 +156,13 @@ const routes: RouteConfig[] = [
 	},
 	{
 		path: 'login',
-		element: lazyLoad(lazy(() => import('@/pages/login')))
+		element: LazyLoad(lazy(() => import('@/pages/login')))
 	},
 	{
 		path: '/403',
 		element: <div className="tw-font-bold">无权限</div>
 	},
-	{ path: '*', element: lazyLoad(lazy(() => import('@/pages/notFound'))) }
+	{ path: '*', element: LazyLoad(lazy(() => import('@/pages/notFound'))) }
 ]
 
 //获取路由之前处理

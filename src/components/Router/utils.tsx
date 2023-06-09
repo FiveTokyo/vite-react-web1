@@ -8,7 +8,6 @@ import { cloneDeep, isObject } from 'lodash-es'
 import { Link, matchPath, useMatch, useParams } from 'react-router-dom'
 import { ProcessLoading } from '@/components/Loading'
 import { removeAllPendingRequestsRecord } from '@/api/request'
-import routes from '@/routes'
 
 // 过滤路由配置权限
 // export function filterRoutesAccess(routes: Routes, checkFn: (access: string) => boolean) {
@@ -59,19 +58,23 @@ export const lazyLoad = (Com: LazyExoticComponent<any>): ReactNode => {
  */
 export const searchRoute = (
 	pathname: string,
-	routers: RouteConfig | RouteConfig[] = routes
+	routers: RouteConfig | RouteConfig[]
 ): RouteConfig => {
 	//处理动态路由
-	const _deep = (routes: (RouteConfig | RouteConfig[] ), name = '') => {
+	const _deep = (routes: RouteConfig | RouteConfig[], name = '') => {
 		let result: RouteConfig = {}
-		const _routes = Array.isArray(routes) ? routes : routes.children as RouteConfig[]
+		const _routes = Array.isArray(routes) ? routes : (routes.children as RouteConfig[])
 		for (let i = 0; i < _routes.length; i++) {
 			const item = _routes[i]
 			const prev = name + '/'
-			if (
-				matchPath({ path: prev + item.path, end: true, caseSensitive: false }, pathname)
+			const target = matchPath(
+				{ path: prev + item.path, end: true, caseSensitive: false },
+				pathname
 			)
-				return { ...item, key: prev + item.path }
+			if (target) {
+				return { ...item, key: target.pathname, params: target.params }
+			}
+
 			if (item.children?.length) {
 				const res = _deep(item.children, prev + item.path)
 				if (Object.keys(res).length) result = res

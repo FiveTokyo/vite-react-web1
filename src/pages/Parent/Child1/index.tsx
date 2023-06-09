@@ -2,8 +2,11 @@
 import { JMTable } from '@/components'
 import { Input } from 'antd'
 import { FC } from 'react'
+import { useParams } from 'react-router-dom'
 
 const Child1 = () => {
+	const params = useParams()
+	console.log('Child1',params)
 	return (
 		<>
 			<div className="tw-bg-primary tw-font-bold">开启了keepAlive</div>
@@ -12,10 +15,10 @@ const Child1 = () => {
 				cols={[
 					{
 						dataIndex: 'test',
-						title: '测试',
+						title: '测试', 
 						transformSearch: () => ({}),
 						onDiyCell: (record, index, settingCols) => {
-							return <div>sdasd</div>	
+							return <div>sdasddasda阿萨达大多数 asd</div>	
 						},
 					},
 					{ dataIndex: 'test1', title: '测试1' }

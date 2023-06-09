@@ -1,6 +1,6 @@
 import LeftSiderPro, { LeftSiderProProps } from './components/LeftSiderPro'
 import { FC, memo, useEffect } from 'react'
-import { useLocation, useOutlet, useRoutes } from 'react-router-dom'
+import { Routes, useLocation, useOutlet, useParams, useRoutes } from 'react-router-dom'
 
 import { Layout } from 'antd'
 import { layoutSettings } from '@/config/defaultSetting'
@@ -11,6 +11,7 @@ import useCurrentUser from '@/hooks/useUser'
 import useMyRoutes from '@/hooks/useRoutes'
 
 type LayoutProProps = ContentProProps & LeftSiderProProps
+
 
 const LayoutPro: FC<LayoutProProps> = props => {
 	const { userLogout } = useCurrentUser()

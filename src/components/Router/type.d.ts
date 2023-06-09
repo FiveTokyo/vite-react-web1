@@ -22,6 +22,7 @@ interface RouteExtension {
 	hideInMenu?: boolean
 	/* 扩展的children */
 	children?: RouteConfig[]
+	params?: { [key: string]: any }
 }
 
 export type RouteConfig = Merge<RouteExtension, RouteObject>

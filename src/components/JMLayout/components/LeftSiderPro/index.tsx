@@ -4,12 +4,10 @@ import { Layout, Menu } from 'antd'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import styles from './index.module.less'
 import { memo, useEffect, useMemo, useState } from 'react'
-import routers from '@/routes'
 import { ItemType } from 'antd/lib/menu/hooks/useItems'
 import { RouteConfig } from '@/components/Router/type'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { layoutSettings } from '@/config/defaultSetting'
-import { intersection, isEqual, uniq } from 'lodash-es'
+import { isEqual, uniq } from 'lodash-es'
 import { searchRoute } from '@/components/Router/utils'
 
 const { Sider } = Layout
@@ -22,8 +20,12 @@ export interface LeftSiderProProps {
 }
 
 function routesToMenu(routes: RouteConfig[], path: string = '') {
+	if (!routes) return []
 	let result = routes
-		.filter((route: RouteConfig) => route.hasOwnProperty('path') && !route.hideInMenu && !route.notAccess)!
+		.filter(
+			(route: RouteConfig) =>
+				route.hasOwnProperty('path') && !route.hideInMenu && !route.notAccess
+		)!
 		.map((route: RouteConfig) => {
 			const newPath = path + '/' + route.path
 			return {
@@ -46,9 +48,8 @@ function getOpenKeys(location: ReturnType<typeof useLocation>) {
 	}
 	return keys
 }
-
 const LeftSiderPro = (props: LeftSiderProProps) => {
-	const { routes = [], siderWidth, logo, title } = props
+	const { routes, siderWidth, logo, title } = props
 	const location = useLocation()
 	const [openKeys, setOpenKeys] = useState<string[]>([])
 	const [selectedKeys, setSelectedKeys] = useState<string[]>([])
@@ -61,7 +62,7 @@ const LeftSiderPro = (props: LeftSiderProProps) => {
 		if (!isEqual([...newOpenKeys], [...openKeys])) {
 			setOpenKeys(newOpenKeys)
 		}
-	}, [location.pathname])
+	}, [location.pathname, routes])
 
 	const navigate = useNavigate()
 	const [collapsed, setCollapsed] = useState(false)
